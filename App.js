@@ -1,44 +1,25 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow
- */
-
-import React, {Component} from 'react';
-import {Platform, StyleSheet, Text, View} from 'react-native';
-import { Router, Scene} from 'react-native-router-flux'
-import Authentication from './routes/Authentication'
-import HomePage from './routes/Homepage'
-
-const instructions = Platform.select({
-  ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
-  android:
-    'Double tap R on your keyboard to reload,\n' +
-    'Shake or press menu button for dev menu',
-});
+import React, {Component} from 'react'
+import AsyncStorage from '@react-native-community/async-storage'
+import {Platform, StyleSheet, Text, View, ActivityIndicator} from 'react-native'
+import Routes from './routes/Routes'
 
 class App extends Component {
+
+  state = { hasToken: false, isLoaded: false }
+
+  componentDidMount() {
+    AsyncStorage.getItem('id_token').then((token) => {
+      this.setState({ hasToken: token !== null, isLoaded: true })
+    })
+  }
+
   render() {
     return(
-      <Router>
-        <Scene key='root'>
-          <Scene
-            component={Authentication}
-            hideNavBar={false}
-            initial={true}
-            key='Authentication'
-            title='Authentication'
+      !this.state.isLoaded
+        ? <ActivityIndicator />
+        : <Routes
+            hasToken={this.state.hasToken}
           />
-          <Scene
-            component={HomePage}
-            hideNavBar={true}
-            key='HomePage'
-            title='Home Page'
-          />
-        </Scene>
-      </Router>
     )
   }
 }
